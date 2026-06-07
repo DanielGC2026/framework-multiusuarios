@@ -1,0 +1,1 @@
+# Guía de Configuración de la Máquina Virtual
