@@ -3,17 +3,11 @@
 ###############################################################################
 # Nombre: desplegar_usuarios.sh
 #
-# Propósito:
+# Descripción:
 # Aprovisionamiento masivo e idempotente de usuarios.
 #
 # Autor:
 # Framework Multiusuario
-#
-# Dependencias:
-# useradd
-# getent
-# id
-# bash
 #
 # Ejecución:
 # sudo ./desplehar_usuarios.sh usuarios.yaml
