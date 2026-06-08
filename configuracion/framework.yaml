@@ -1,0 +1,71 @@
+###############################################################################
+# Archivo: framework.yaml
+#
+# Propósito:
+# Configuración general del Framework Multiusuario.
+#
+###############################################################################
+
+framework:
+
+  name: "Framework Multiusuarios"
+
+  version: "1.0.0"
+
+  environment: "production"
+
+  logs:
+
+    provision: "/var/log/framework_user_provision.log"
+
+    cleanup: "/var/log/framework_cleanup.log"
+
+    alerts: "/var/log/framework_alerts.log"
+
+    drift: "/var/log/framework_drift.log"
+
+  notifications:
+
+    administrator_email: "root@localhost"
+
+    enabled: true
+
+  inventory:
+
+    json_output: "inventory.json"
+
+    csv_output: "inventory.csv"
+
+  users:
+
+    shell: "/bin/bash"
+
+    create_home: true
+
+  filesystem:
+
+    home_directory: "/home"
+
+    skeleton_directory: "/etc/skel"
+
+    temp_directory: "/tmp"
+
+  monitoring:
+
+    auth_log: "/var/log/auth.log"
+
+    failed_login_threshold: 5
+
+  maintenance:
+
+    temp_cleanup_days: 1
+
+    drift_check_frequency: "hourly"
+
+  services:
+
+    cleanup_timer: "cleanup_tmp.timer"
+
+    drift_timer: "drift_detector.timer"
+
+    anomaly_timer: "anomaly_monitor.timer"
