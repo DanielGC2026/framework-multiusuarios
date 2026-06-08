@@ -1,0 +1,96 @@
+###############################################################################
+# Archivo: limits.yaml
+#
+# Propósito:
+# Definir los límites operativos del framework.
+#
+# Basado en la Matriz de Cuotas y Límites de Recursos.
+###############################################################################
+
+quotas:
+
+  disk:
+
+    soft_limit_percent: 90
+
+    hard_limit_percent: 100
+
+    grace_period: "7days"
+
+cgroups:
+
+  cpu:
+
+    max_percentage: 40
+
+    cpu_max: "40000 100000"
+
+  memory:
+
+    memory_high_bytes: 1073741824
+
+    memory_high_human: "1GB"
+
+permissions:
+
+  umask: "027"
+
+filesystem:
+
+  default_directory_permission: "750"
+
+  default_file_permission: "640"
+
+security:
+
+  failed_login_threshold: 5
+
+  failed_login_window_minutes: 10
+
+maintenance:
+
+  temporary_file_max_age_hours: 24
+
+alerts:
+
+  enabled: true
+
+  events:
+
+    - disk_soft_limit
+
+    - disk_hard_limit
+
+    - cpu_limit_exceeded
+
+    - memory_limit_exceeded
+
+    - anomalous_login
+
+    - configuration_drift
+
+anomalies:
+
+  cpu_ram_starvation:
+
+    detection: "cpu.stat + memory.current"
+
+    mitigation: "cgroups_v2"
+
+  disk_depletion:
+
+    detection: "quota"
+
+    mitigation: "hard_limit"
+
+  configuration_drift:
+
+    detection: "permission_baseline"
+
+    mitigation: "automatic_restore"
+
+  anomalous_login:
+
+    detection: "auth.log"
+
+    mitigation: "email_alert"
