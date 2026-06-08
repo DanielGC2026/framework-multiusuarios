@@ -1,0 +1,4 @@
+# Forzar que todos los scripts sean LF
+*.sh text eol=lf
+*.py text eol=lf
+*.yaml text eol=lf
