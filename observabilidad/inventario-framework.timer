@@ -1,0 +1,13 @@
+[Unit]
+Description=Framework Multiusuarios - Generador de Inventario Timer
+Documentation=file:///opt/framework/README.md
+After=network.target
+
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=30min
+Persistent=true
+AccuracySec=10s
+
+[Install]
+WantedBy=timers.target

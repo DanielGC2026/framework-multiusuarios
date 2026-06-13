@@ -1,0 +1,13 @@
+[Unit]
+Description=Framework Multiusuarios - Monitoreo de Anomalías Timer
+Documentation=file:///opt/framework/README.md
+After=network.target
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=5min
+Persistent=true
+AccuracySec=10s
+
+[Install]
+WantedBy=timers.target

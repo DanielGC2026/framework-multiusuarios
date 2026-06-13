@@ -1,0 +1,14 @@
+[Unit]
+Description=Framework Multiusuarios - Generador de Inventario
+Documentation=file:///opt/framework/README.md
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /opt/framework/generador_inventario.py
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=framework-inventory
+
+[Install]
+WantedBy=multi-user.target

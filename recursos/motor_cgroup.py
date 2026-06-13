@@ -29,7 +29,7 @@ def escribir_controlador(ruta_archivo: Path, valor: str):
     """Escribe un valor de control dentro de la interfaz del sistema de archivos de cgroups."""
     try:
         with open(ruta_archivo, "w") as f:
-            f.write(value + "\n")
+            f.write(valor + "\n")
     except PermissionError:
         print(f"[ERROR] Permisos insuficientes para escribir en {ruta_archivo}. ¿Ejecutó como sudo?", file=sys.stderr)
         sys.exit(1)

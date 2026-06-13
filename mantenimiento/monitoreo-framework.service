@@ -1,0 +1,14 @@
+[Unit]
+Description=Framework Multiusuarios - Monitoreo de Anomalías
+Documentation=file:///opt/framework/README.md
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /opt/framework/mitigador_anomalias.py
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=framework-monitoring
+
+[Install]
+WantedBy=multi-user.target

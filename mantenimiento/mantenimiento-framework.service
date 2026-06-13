@@ -1,0 +1,15 @@
+[Unit]
+Description=Framework Multiusuarios - Mantenimiento Autónomo
+Documentation=file:///opt/framework/README.md
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/framework/limpieza_tmp.sh
+ExecStart=/opt/framework/detector_deriva.py
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=framework-maintenance
+
+[Install]
+WantedBy=multi-user.target

@@ -1,3 +1,28 @@
-daniel : 2001
-uriel : 2002
-eduardo : 2003
+# Dataset de Usuarios para Pruebas del Framework Multiusuarios
+# Formato: usuario:uid:cuota_gb
+# 
+# Instrucciones:
+# 1. Cambiar permisos: chmod 600 usuarios.txt
+# 2. Ejecutar: sudo ./desplegar_usuarios.sh usuarios.txt
+# 
+# IMPORTANTE: Los UIDs debe ser >= 1000 para usuarios normales
+
+# Usuarios de prueba
+juan:1000:5
+maria:1001:8
+pedro:1002:3
+carlos:1003:10
+ana:1004:5
+luis:1005:15
+sofia:1006:4
+diego:1007:7
+elena:1008:6
+gabriel:1009:12
+
+# Usuarios para pruebas de estrés
+stress_user_1:2000:20
+stress_user_2:2001:20
+stress_user_3:2002:20
+
+# Usuario de pruebas de anomalías
+anomaly_test:3000:5
