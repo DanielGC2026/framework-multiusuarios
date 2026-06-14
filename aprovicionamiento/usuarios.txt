@@ -8,21 +8,21 @@
 # IMPORTANTE: Los UIDs debe ser >= 1000 para usuarios normales
 
 # Usuarios de prueba
-juan:1000:5
-maria:1001:8
-pedro:1002:3
-carlos:1003:10
-ana:1004:5
-luis:1005:15
-sofia:1006:4
-diego:1007:7
-elena:1008:6
-gabriel:1009:12
+juan:3000:5
+maria:3001:8
+pedro:3002:3
+carlos:3003:10
+ana:3004:5
+luis:3005:15
+sofia:3006:4
+diego:3007:7
+elena:3008:6
+gabriel:3009:12
 
 # Usuarios para pruebas de estrés
-stress_user_1:2000:20
-stress_user_2:2001:20
-stress_user_3:2002:20
+stress_user_1:3010:20
+stress_user_2:3011:20
+stress_user_3:3012:20
 
 # Usuario de pruebas de anomalías
-anomaly_test:3000:5
+anomaly_test:3013:5
