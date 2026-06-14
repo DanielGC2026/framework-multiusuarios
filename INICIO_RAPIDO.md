@@ -267,22 +267,3 @@ sudo python3 recursos/motor_cgroup.py
 # ¡ADVERTENCIA! Elimina TODOS los usuarios del framework
 sudo bash aprovicionamiento/rollback_emergencia.sh reset_all
 ```
-
----
-
-## Próximas Implementaciones
-
-- [ ] Dashboard web en tiempo real
-- [ ] API REST para automatización
-- [ ] Integración con LDAP/Active Directory
-- [ ] Snapshots automáticos de usuarios
-- [ ] Análisis predictivo de anomalías
-- [ ] Backup automático de directorios
-
----
-
-## Contacto y Soporte
-
-Proyecto: Framework Multiusuarios de Alta Disponibilidad
-Institución: Facultad de Contaduría y Administración UNAM
-Integrantes: Daniel González, Uriel Hernández, Eduardo Merino

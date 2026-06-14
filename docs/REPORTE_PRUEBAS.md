@@ -19,18 +19,9 @@ Antes de ejecutar las pruebas de estrés, asegúrate de que:
     - sudo bash aprovicionamiento/desplegar_usuarios.sh aprovicionamiento/usuarios.txt
 
 4. El grupo de control (cgroup) "framework_users" está configurado. Si no existe, créalo de la siguiente manera:
-
-    **Opción A - Automatizada (recomendada):**
     
     Ejecuta el orquestador del framework que configurará todo automáticamente:
     - sudo bash orquestador_framework.sh setup
-    
-    **Opción B - Manual:**
-    
-    Si solo quieres configurar el cgroup, ejecuta:
-    - sudo python3 recursos/motor_cgroup.py
-    
-    **Verificación:**
     
     Comprueba que el cgroup se creó correctamente:
     - ls /sys/fs/cgroup/framework_users/
