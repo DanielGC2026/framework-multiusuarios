@@ -21,7 +21,7 @@
 # sudo ./desplegar_usuarios.sh usuarios.txt
 ###############################################################################
 
-set -eu
+set -e
 
 LOGFILE="/var/log/framework_user_provision.log"
 CONFIG_FILE="${1:-}"
@@ -67,7 +67,10 @@ USUARIOS_FALLIDOS=0
 # Leer el archivo línea por línea (ignorando líneas vacías y comentarios con #)
 while IFS=':' read -r username uid quota_gb || [ -n "$username" ]; do
     
-    # Limpiar espacios en blanco y saltar comentarios o líneas vacías
+    # Si no hay más líneas, salir del loop
+    if [ -z "$username" ]; then
+        break
+    fi
     username=$(echo "$username" | tr -d '[:space:]')
     uid=$(echo "$uid" | tr -d '[:space:]')
     quota_gb=$(echo "$quota_gb" | tr -d '[:space:]')
@@ -100,15 +103,13 @@ while IFS=':' read -r username uid quota_gb || [ -n "$username" ]; do
         # ================================================================
         
         # 1. Aplicar permisos restrictivos (750 = umask 027)
-        if chmod 750 "/home/$username" >> "$LOGFILE" 2>&1; then
-            echo "[OK] Permisos aplicados a /home/$username" >> "$LOGFILE"
-        fi
+        chmod 750 "/home/$username" >> "$LOGFILE" 2>&1 || true
         
         # 2. Asignar cuota de disco individual
         if [ -n "$quota_gb" ] && [ "$quota_gb" -gt 0 ]; then
             if [ -f "$FRAMEWORK_ROOT/recursos/asignar_cuota_usuario.sh" ]; then
                 bash "$FRAMEWORK_ROOT/recursos/asignar_cuota_usuario.sh" "$username" "$quota_gb" >> "$LOGFILE" 2>&1 || {
-                    echo -e "${YELLOW}[WARN]${NC} No se pudo asignar cuota a $username"
+                    echo -e "${YELLOW}[WARN]${NC} No se pudo asignar cuota a $username" | tee -a "$LOGFILE"
                 }
             fi
         fi
@@ -124,7 +125,9 @@ while IFS=':' read -r username uid quota_gb || [ -n "$username" ]; do
         
         # 4. Ejecutar script de inicialización del usuario (si existe)
         if [ -f "$FRAMEWORK_ROOT/recursos/inicializador_usuario.sh" ]; then
-            bash "$FRAMEWORK_ROOT/recursos/inicializador_usuario.sh" "$username" >> "$LOGFILE" 2>&1 || true
+            bash "$FRAMEWORK_ROOT/recursos/inicializador_usuario.sh" "$username" >> "$LOGFILE" 2>&1 || {
+                echo -e "${YELLOW}[WARN]${NC} Error en inicializador de $username" | tee -a "$LOGFILE"
+            }
         fi
         
     else
