@@ -21,8 +21,6 @@
 # sudo ./desplegar_usuarios.sh usuarios.txt
 ###############################################################################
 
-set -e
-
 LOGFILE="/var/log/framework_user_provision.log"
 CONFIG_FILE="${1:-}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -38,7 +36,8 @@ NC='\033[0m'
 touch "$LOGFILE"
 
 cleanup() {
-    if [ $? -ne 0 ]; then
+    local exit_code=$?
+    if [ $exit_code -ne 0 ]; then
         echo "[$(date '+%Y-%m-%d %H:%M:%S')] [CRITICAL] El proceso se interrumpió inesperadamente." >> "$LOGFILE"
     fi
 }
@@ -64,17 +63,12 @@ USUARIOS_CREADOS=0
 USUARIOS_EXISTENTES=0
 USUARIOS_FALLIDOS=0
 
-# Leer el archivo línea por línea (ignorando líneas vacías y comentarios con #)
 while IFS=':' read -r username uid quota_gb || [ -n "$username" ]; do
-    
-    # Si no hay más líneas, salir del loop
-    if [ -z "$username" ]; then
-        break
-    fi
-    username=$(echo "$username" | tr -d '[:space:]')
-    uid=$(echo "$uid" | tr -d '[:space:]')
-    quota_gb=$(echo "$quota_gb" | tr -d '[:space:]')
-    
+
+    username=$(echo "$username" | tr -d '\r' | tr -d '[:space:]')
+    uid=$(echo "$uid"       | tr -d '\r' | tr -d '[:space:]')
+    quota_gb=$(echo "$quota_gb" | tr -d '\r' | tr -d '[:space:]')
+
     [[ -z "$username" || "$username" == \#* ]] && continue
 
     echo -e "${YELLOW}[PROCESANDO]${NC} Usuario: $username (UID: $uid, Cuota: ${quota_gb}GB)" | tee -a "$LOGFILE"
@@ -82,29 +76,30 @@ while IFS=':' read -r username uid quota_gb || [ -n "$username" ]; do
     # Validación idempotente del Usuario
     if getent passwd "$username" >/dev/null 2>&1; then
         echo -e "${YELLOW}[INFO]${NC} El usuario '$username' ya existe en el sistema. Omitiendo." | tee -a "$LOGFILE"
-        ((USUARIOS_EXISTENTES++))
+
+        USUARIOS_EXISTENTES=$((USUARIOS_EXISTENTES + 1))
         continue
     fi
 
     # Validación idempotente del UID
     if getent passwd "$uid" >/dev/null 2>&1; then
         echo -e "${RED}[ERROR]${NC} El UID '$uid' ya está ocupado por otra cuenta. Omitiendo '$username'." | tee -a "$LOGFILE"
-        ((USUARIOS_FALLIDOS++))
+        USUARIOS_FALLIDOS=$((USUARIOS_FALLIDOS + 1))
         continue
     fi
 
     # Crear el usuario
     if useradd -u "$uid" -m -s /bin/bash "$username" >> "$LOGFILE" 2>&1; then
         echo -e "${GREEN}[✓]${NC} Usuario creado: $username" | tee -a "$LOGFILE"
-        ((USUARIOS_CREADOS++))
-        
+        USUARIOS_CREADOS=$((USUARIOS_CREADOS + 1))
+
         # ================================================================
         # DISPARADORES DEL FRAMEWORK - INTEGRACIÓN COMPLETA
         # ================================================================
-        
+
         # 1. Aplicar permisos restrictivos (750 = umask 027)
         chmod 750 "/home/$username" >> "$LOGFILE" 2>&1 || true
-        
+
         # 2. Asignar cuota de disco individual
         if [ -n "$quota_gb" ] && [ "$quota_gb" -gt 0 ]; then
             if [ -f "$FRAMEWORK_ROOT/recursos/asignar_cuota_usuario.sh" ]; then
@@ -113,38 +108,37 @@ while IFS=':' read -r username uid quota_gb || [ -n "$username" ]; do
                 }
             fi
         fi
-        
+
         # 3. Asignar a cgroup del framework (si existe)
         if [ -d "/sys/fs/cgroup/framework_users" ]; then
-            # Obtener PIDs del usuario y agregarlos al cgroup
             for pid in $(pgrep -u "$uid" 2>/dev/null || true); do
                 echo "$pid" > "/sys/fs/cgroup/framework_users/cgroup.procs" 2>/dev/null || true
             done
             echo "[OK] Usuario agregado a cgroup framework_users" >> "$LOGFILE"
         fi
-        
+
         # 4. Ejecutar script de inicialización del usuario (si existe)
         if [ -f "$FRAMEWORK_ROOT/recursos/inicializador_usuario.sh" ]; then
             bash "$FRAMEWORK_ROOT/recursos/inicializador_usuario.sh" "$username" >> "$LOGFILE" 2>&1 || {
                 echo -e "${YELLOW}[WARN]${NC} Error en inicializador de $username" | tee -a "$LOGFILE"
             }
         fi
-        
+
     else
         echo -e "${RED}[ERROR]${NC} Fallo al crear usuario '$username'" | tee -a "$LOGFILE"
-        ((USUARIOS_FALLIDOS++))
+        USUARIOS_FALLIDOS=$((USUARIOS_FALLIDOS + 1))
     fi
 
-done < "$CONFIG_FILE"
+done < <(tr -d '\r' < "$CONFIG_FILE")
 
 # Resumen final
 echo "" | tee -a "$LOGFILE"
 echo "========================================" | tee -a "$LOGFILE"
 echo "RESUMEN DE APROVISIONAMIENTO" | tee -a "$LOGFILE"
 echo "========================================" | tee -a "$LOGFILE"
-echo -e "${GREEN}Usuarios creados: $USUARIOS_CREADOS${NC}" | tee -a "$LOGFILE"
-echo -e "${YELLOW}Usuarios existentes: $USUARIOS_EXISTENTES${NC}" | tee -a "$LOGFILE"
-echo -e "${RED}Usuarios fallidos: $USUARIOS_FALLIDOS${NC}" | tee -a "$LOGFILE"
+echo -e "${GREEN}Usuarios creados:     $USUARIOS_CREADOS${NC}" | tee -a "$LOGFILE"
+echo -e "${YELLOW}Usuarios existentes:  $USUARIOS_EXISTENTES${NC}" | tee -a "$LOGFILE"
+echo -e "${RED}Usuarios fallidos:    $USUARIOS_FALLIDOS${NC}" | tee -a "$LOGFILE"
 echo "========================================" | tee -a "$LOGFILE"
 echo "Logs completos en: $LOGFILE"
 echo ""
